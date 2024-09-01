@@ -1,0 +1,24 @@
+/* sidebar.component.css */
+aside {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-right: 1px solid #ddd;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+nav li {
+  margin: 10px 0;
+}
+
+.menuLateral {
+  background: #fff;
+  position: absolute;
+  margin-top: 0;
+  height: 100%;
+  overflow: hidden;
+  width: 220px;
+}

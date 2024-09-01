@@ -1,0 +1,26 @@
+/* header.component.css */
+header{
+  min-width: 100%;
+  height: 88px;
+  background: #124d81;
+  z-index: 99;
+  position: relative;
+}
+
+h1{
+  color: #fff;
+}
+
+.logocfc{
+  float: left;
+  margin: 0 0 0 0;
+  background-color: #E7E7E7;
+  width: 220px;
+}
+
+.logout{
+  margin: 25px;
+    font-size: large;
+    position: relative;
+    float: right;
+}

@@ -1,0 +1,50 @@
+networks:
+  product-sales-network:
+    driver: bridge
+
+volumes:
+  mssql-data:
+    driver: local
+
+services:
+  webapi:
+    image: product-sales-api
+    build:
+      context: .
+      dockerfile: Dockerfile-desenvolvimento
+    ports:
+      - "5000:5000"
+    networks:
+      - product-sales-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=mysql_banco_de_dados;Database=database_src;User=mysql;Password=database_password;
+        
+    depends_on:
+      mysql_banco_de_dados:
+        condition: service_healthy      
+
+  mysql_banco_de_dados:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${DATABASE_USER}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      # Exemplo: OTEL_ENABLED: "false" (se fosse necessário)
+      OTEL_ENABLED: "false"
+    ports:
+      - 3307:3306
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+ 
+
+    volumes:
+      - ./app-artefatos/db-init:/docker-entrypoint-initdb.d    
+      - mssql-data:/var/lib/mysql:rw  
+
+    networks:
+      - product-sales-network

@@ -1,0 +1,37 @@
+# Usando a imagem base do ASP.NET Core Runtime para a aplicação em produção
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+ENV ASPNETCORE_URLS=http://+:5000
+EXPOSE 5000
+
+
+
+# Usando a imagem base do SDK do .NET para construir a aplicação
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["./WebAPI/WebAPI.csproj", "WebAPI/"]
+COPY ["./Application/Application.csproj", "Application/"]
+COPY ["./UseCase/UseCase.csproj", "UseCase/"]
+COPY ["./Core/Core.csproj", "Core/"]
+COPY ["./InfraStructure/InfraStructure.csproj", "InfraStructure/"]
+RUN dotnet restore "WebAPI/WebAPI.csproj"
+COPY . .
+WORKDIR "/src/WebAPI"
+RUN dotnet build "WebAPI.csproj" -c Release -o /app/build
+
+# Publicando a aplicação para produção
+FROM build AS publish
+RUN dotnet publish "WebAPI.csproj" -c Release -o /app/publish
+
+# Configurando a imagem final
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+
+
+
+# Instalar curl
+RUN apt-get update && apt-get install -y curl
+
+ENTRYPOINT ["dotnet", "WebAPI.dll"]
+
